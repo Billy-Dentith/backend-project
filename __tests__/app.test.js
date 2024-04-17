@@ -401,3 +401,24 @@ describe('/api/users', () => {
         })
     })
 })
+
+describe('/api/users/:username', () => {
+    test('GET 200: Should return a user object from provided username', () => {
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+        .then(({ body: { user }}) => {
+            expect(user.username).toBe('butter_bridge');
+            expect(user.name).toBe('jonny');
+            expect(user.avatar_url).toBe('https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg');
+        })
+    })
+    test('GET 404: Should return an appropriate status and error message when provided an invalid username', () => {
+        return request(app)
+        .get('/api/users/invalid_username')
+        .expect(404)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('User Not Found')
+        })
+    })
+})
