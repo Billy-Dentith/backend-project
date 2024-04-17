@@ -19,8 +19,10 @@ exports.getArticleDataById = (article_id) => {
     })
 }
 
-exports.getAllArticlesData = (topic) => {
+exports.getAllArticlesData = (topic, sort_by='created_at', order='desc') => {
     return selectTopics().then((topicsArray) => {
+        const validOrders = ['asc', 'desc'];
+        const validSortBys = ['title', 'topic', 'author', 'created_at', 'votes']
         const validTopics = topicsArray.map((topics) => {
             return topics.slug;
         })
@@ -43,8 +45,15 @@ exports.getAllArticlesData = (topic) => {
         }
 
         sqlString += `
-        GROUP BY articles.article_id
-        ORDER BY created_at DESC;`
+        GROUP BY articles.article_id `
+
+        if (sort_by && order) {
+            if (validSortBys.includes(sort_by) && validOrders.includes(order)) {
+                sqlString += `ORDER BY ${sort_by} ${order};`
+            } else {
+                return Promise.reject({ status: 404, message: 'Invalid Query'})
+            }
+        }
 
         return db.query(sqlString, queryVals)
         .then(({ rows }) => {

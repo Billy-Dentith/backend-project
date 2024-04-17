@@ -8,8 +8,8 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getAllArticles = (req, res, next) => {
-    const { topic } = req.query; 
-    getAllArticlesData(topic).then((articles) => {
+    const { topic, sort_by, order } = req.query; 
+    getAllArticlesData(topic, sort_by, order).then((articles) => {
         res.status(200).send({ articles })
     }).catch(next)
 }
