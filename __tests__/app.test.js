@@ -167,6 +167,32 @@ describe('/api/articles', () => {
             expect(message).toBe('Invalid Query')
         })
     })
+    test('GET 200: Should return the array sorted by the provided query in the provided order', () => {
+        return request(app)
+        .get('/api/articles?sort_by=votes&order=asc')
+        .expect(200)
+        .then(({ body: { articles }}) => {
+            expect(articles).toBeSortedBy('votes', { 
+                ascending: true
+            })
+        })
+    })
+    test('GET 404: Should return an appropriate status and error message if provided an invalid sort_by', () => {
+        return request(app)
+        .get('/api/articles?sort_by=invalid_sort')
+        .expect(404)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Invalid Query')
+        })
+    })
+    test('GET 404: Should return an appropriate status and error message if provided an invalid order', () => {
+        return request(app)
+        .get('/api/articles?order=invalid_order')
+        .expect(404)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Invalid Query')
+        })
+    })
 })
 
 describe('/api/articles/:article_id/comments', () => {
