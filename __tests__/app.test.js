@@ -382,6 +382,68 @@ describe('/api/comments/:comment_id', () => {
             expect(message).toBe('Bad Request')
         })
     })
+    test('PATCH 202: Should update a comment by ID and return the updated comment object', () => {
+        const updComment = {
+            inc_votes: 10
+        }
+        return request(app)
+        .patch('/api/comments/1')
+        .send(updComment)
+        .expect(202)
+        .then(({ body: { comment }}) => {
+            expect(comment.comment_id).toBe(1)
+            expect(comment.votes).toBe(26)
+        })
+    })
+    test('PATCH 202: Should update a comment by ID and return the updated comment object (negative vote incrementations)', () => {
+        const updComment = {
+            inc_votes: -10
+        }
+        return request(app)
+        .patch('/api/comments/1')
+        .send(updComment)
+        .expect(202)
+        .then(({ body: { comment }}) => {
+            expect(comment.comment_id).toBe(1)
+            expect(comment.votes).toBe(6)
+        })
+    })
+    test('PATCH 400: Should return an appropriate status and error message when provided a bad body (missing required field / incorrect field)', () => {
+        const updComment = {
+            inc_votes: 'ten'
+        }
+        return request(app)
+        .patch('/api/comments/1')
+        .send(updComment)
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Bad Request')
+        })
+    })
+    test('PATCH 400: Should return an appropriate status and error message when provided an invalid comment ID', () => {
+        const updComment = {
+            inc_votes: 10
+        }
+        return request(app)
+        .patch('/api/comments/invalid_id')
+        .send(updComment)
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Bad Request')
+        })
+    })
+    test('PATCH 404: Should return an appropriate status and error message when provided a valid but non-existent comment ID', () => {
+        const updComment = {
+            inc_votes: 10
+        }
+        return request(app)
+        .patch('/api/comments/9999')
+        .send(updComment)
+        .expect(404)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Comment Does Not Exist')
+        })
+    })
 })
 
 describe('/api/users', () => {
