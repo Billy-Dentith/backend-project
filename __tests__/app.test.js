@@ -195,6 +195,62 @@ describe('/api/articles', () => {
     })
 })
 
+describe('/api/articles', () => {
+    test('POST 201: Should return the posted article', () => {
+        const newArticle = {
+            author: 'icellusedkars',
+            title: '5 things you can do with paper',
+            body: 'origami, paper planes, take notes, throw at someone, burn',
+            topic: 'paper'
+        }
+        return request(app)
+        .post('/api/articles')
+        .send(newArticle)
+        .expect(201)
+        .then(({ body: { article }}) => {
+            expect(article).toMatchObject({
+                article_id: 14,
+                title: '5 things you can do with paper',
+                topic: 'paper',
+                author: 'icellusedkars',
+                body: 'origami, paper planes, take notes, throw at someone, burn',
+                created_at: expect.any(String),
+                votes: 0,
+                article_img_url: 'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700',
+                comment_count: 0
+            })
+        })
+    })
+    test('POST 400: Should return an appropriate status and error message if provided a bad article (missing properties)', () => {
+        const newArticle = {
+            author: 'icellusedkars',
+        }
+        return request(app)
+        .post('/api/articles')
+        .send(newArticle)
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Bad Request')
+        })
+    })
+    test('POST 400: Should return an appropriate status and error message if provided a bad article (extra properties)', () => {
+        const newArticle = {
+            author: 'icellusedkars',
+            title: '5 things you can do with paper',
+            body: 'origami, paper planes, take notes, throw at someone, burn',
+            topic: 'paper',
+            maliciousProperty: 'delete everything'
+        }
+        return request(app)
+        .post('/api/articles')
+        .send(newArticle)
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Invalid Article')
+        })
+    })
+})
+
 describe('/api/articles/:article_id/comments', () => {
     test('GET 200: Should return all the comments for a given article', () => {
         return request(app)

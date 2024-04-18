@@ -85,3 +85,17 @@ exports.updateArticle = (article_id, { inc_votes }) => {
             return rows[0];
         })
 }
+
+exports.insertArticle = ({ author, title, body, topic }) => {
+    const queryStr = `
+        INSERT INTO articles
+            (author, title, body, topic)
+        VALUES
+            ($1, $2, $3, $4)
+        RETURNING*`
+
+    return db.query(queryStr, [author, title, body, topic])
+    .then(({ rows }) => {
+        return this.getArticleDataById(rows[0].article_id)
+    })
+}
