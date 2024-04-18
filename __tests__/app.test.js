@@ -140,6 +140,45 @@ describe('/api/articles', () => {
             })
         })
     })
+    test('GET 200: Should return an array of all the articles paginated according to limit and page queries', () => {
+        return request(app)
+        .get('/api/articles?limit=5&page=3')
+        .expect(200)
+        .then(({ body: { articles }}) => {
+            expect(articles.length).toBe(3);
+            expect(articles[0].article_id).toBe(8);
+            expect(articles[1].article_id).toBe(11);
+            expect(articles[2].article_id).toBe(7);
+        })
+    })
+    test('GET 200: Should return an array of all the articles paginated according page query and with limit defaulting to 10', () => {
+        return request(app)
+        .get('/api/articles?page=2')
+        .expect(200)
+        .then(({ body: { articles }}) => {
+            expect(articles.length).toBe(3);
+            expect(articles[0].article_id).toBe(8);
+            expect(articles[1].article_id).toBe(11);
+            expect(articles[2].article_id).toBe(7);
+        })
+    })
+    test('GET 200: Should return an object with an array of all the articles paginated according to limit and page queries and a total_count key showing the total number of articles', () => {
+        return request(app)
+        .get('/api/articles?topic=mitch&limit=5&page=3')
+        .expect(200)
+        .then(({ body }) => {
+            expect(body.articles.length).toBe(2);
+            expect(body.total_count).toBe(12)
+        })
+    })
+    test('GET 400: Should return an appropriate status and error message if provided an invalid limit query', () => {
+        return request(app)
+        .get('/api/articles?limit=not_a_limit')
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Bad Request')
+        })
+    })
     test('GET 200: Should return an array of articles that meet the provided query of topic', () => {
         return request(app)
         .get('/api/articles?topic=cats')

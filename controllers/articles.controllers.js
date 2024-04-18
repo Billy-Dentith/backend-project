@@ -1,4 +1,4 @@
-const { getArticleDataById, getAllArticlesData, updateArticle, insertArticle } = require("../models/articles.models")
+const { getArticleDataById, getAllArticlesData, updateArticle, insertArticle, getArticleCount } = require("../models/articles.models")
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
@@ -8,9 +8,11 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getAllArticles = (req, res, next) => {
-    const { topic, sort_by, order } = req.query; 
-    getAllArticlesData(topic, sort_by, order).then((articles) => {
-        res.status(200).send({ articles })
+    const { topic, sort_by, order, limit, page } = req.query; 
+
+    Promise.all([getAllArticlesData(topic, sort_by, order, limit, page), getAllArticlesData(topic)])
+    .then(([paginatedArticles, allArticals]) => {
+        res.status(200).send({ articles: paginatedArticles, total_count: allArticals.length  })
     }).catch(next)
 }
 
