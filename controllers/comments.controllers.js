@@ -4,8 +4,9 @@ const { checkUserExists } = require("../models/users.models")
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const article_id = req.params.article_id
+    const { limit, page } = req.query;
 
-    Promise.all([getCommentsByArticleIdData(article_id), checkArticleExists(article_id)])
+    Promise.all([getCommentsByArticleIdData(article_id, limit, page), checkArticleExists(article_id)])
     .then(([ comments ]) => {
         res.status(200).send({ comments })
     }).catch(next)

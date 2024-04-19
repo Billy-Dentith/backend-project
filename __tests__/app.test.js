@@ -342,6 +342,32 @@ describe('/api/articles/:article_id/comments', () => {
             expect(message).toBe('Bad Request')
         })
     })
+    test('GET 200: Should return an array of all the comments paginated according to limit and page queries', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=5&page=3')
+        .expect(200)
+        .then(({ body: { comments }}) => {
+            expect(comments.length).toBe(1);
+            expect(comments[0].comment_id).toBe(9);
+        })
+    })
+    test('GET 200: Should return an array of all the comments paginated according page query and with limit defaulting to 10', () => {
+        return request(app)
+        .get('/api/articles/1/comments?page=2')
+        .expect(200)
+        .then(({ body: { comments }}) => {
+            expect(comments.length).toBe(1);
+            expect(comments[0].comment_id).toBe(9);
+        })
+    })
+    test('GET 400: Should return an appropriate status and error message if provided an invalid limit query', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=not_a_limit')
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Bad Request')
+        })
+    })
 })
 
 describe('/api/articles/:article_id/comments', () => {

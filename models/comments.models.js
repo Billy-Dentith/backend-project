@@ -1,14 +1,34 @@
 const db = require('../db/connection')
 const format = require('pg-format')
 
-exports.getCommentsByArticleIdData = (article_id) => {
-    return db.query(`
-    SELECT* 
-    FROM comments
-    WHERE article_id=$1
-    ORDER BY created_at DESC`, 
-    [article_id])
-    .then(({ rows }) => {
+exports.getCommentsByArticleIdData = (article_id, limit, page) => {
+    let sqlString = `
+        SELECT* 
+        FROM comments
+        WHERE article_id=$1
+        ORDER BY created_at DESC `
+    
+    let offset = 0;
+    const queryVals = [article_id];
+
+    if (limit) {
+        sqlString += `LIMIT $${queryVals.length + 1} `
+        queryVals.push(limit);
+    }
+    if (page) {
+        if (!limit) {
+            sqlString += `LIMIT 10 `
+            offset = (page - 1) * 10;
+        } else {
+            offset = (page - 1) * limit;
+        }
+        sqlString += `OFFSET $${queryVals.length + 1} `
+        queryVals.push(offset);
+    }
+
+    sqlString += `;`
+    
+    return db.query(sqlString, queryVals).then(({ rows }) => {
         return rows;
     })
 }
