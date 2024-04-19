@@ -9,6 +9,16 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "POST /api/topics": {
+    "description": "posts a topic and returns posted topic to client",
+    "exampleRequest": {
+      "slug": "topic name",
+      "description": "topic description"
+    },
+    "exampleResponse": {
+      "topic": [{ "slug": "football", "description": "Footie!" }]
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order", "limit", "page"],
