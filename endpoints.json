@@ -12,8 +12,8 @@
   "POST /api/topics": {
     "description": "posts a topic and returns posted topic to client",
     "exampleRequest": {
-      "slug": "topic name",
-      "description": "topic description"
+      "slug": "football",
+      "description": "Footie!"
     },
     "exampleResponse": {
       "topic": [{ "slug": "football", "description": "Footie!" }]
@@ -50,6 +50,12 @@
   "POST /api/articles": {
     "description": "posts an article and returns posted article to client",
     "queries": [],
+    "exampleRequest": {
+      "author": "icellusedkars",
+      "title": "5 things you can do with paper",
+      "body": "origami, paper planes, take notes, throw at someone, burn",
+      "topic": "paper"
+    },
     "exampleResponse": {
       "article":
         {
@@ -110,6 +116,10 @@
   "POST /api/articles/:article_id/comments": {
     "description": "posts a comment based on given article id and returns added comment to client",
     "queries": [],
+    "exampleRequest": {
+      "body": "I love pugs",
+      "user": "lurker"
+    },
     "exampleResponse": {
       "comment": 
         {

@@ -6,9 +6,7 @@ const request = require('supertest');
 const availableEndpoints = require('../endpoints.json');
 
 afterAll(() => db.end());
-
 beforeEach(() => seed(testData));
-
 
 describe('/api/healthcheck', () => {
     test('GET 200: Should respond with a 200 ok status code', () => {
@@ -28,6 +26,17 @@ describe('Invalid Endpoints', () => {
         .expect(404)
         .then(({ body: { message } }) => {
             expect(message).toBe('Endpoint Not Found');
+        })
+    })
+})
+
+describe('/api', () => {
+    test('GET 200: Should return a description of all available endpoints', () => {
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({ body }) => {
+            expect(body).toEqual(availableEndpoints)
         })
     })
 })
@@ -72,7 +81,7 @@ describe('/api/topics', () => {
             expect(message).toBe("Bad Request")
         })
     })
-    test('POST 400: Should return an appropriate status and error message when provided with extra unwanted properties in the new topic', () => {
+    test('POST 400: Should return an appropriate status and error message when provided with extra unwanted properties in the new topic object', () => {
         const newTopic = {
             slug: "new topic",
             description: "new topic description",
@@ -84,17 +93,6 @@ describe('/api/topics', () => {
         .expect(400)
         .then(({ body: { message }}) => {
             expect(message).toBe("Invalid Topic")
-        })
-    })
-})
-
-describe('/api', () => {
-    test('GET 200: Should return a description of all available endpoints', () => {
-        return request(app)
-        .get('/api')
-        .expect(200)
-        .then(({ body }) => {
-            expect(body).toEqual(availableEndpoints)
         })
     })
 })
@@ -239,10 +237,10 @@ describe('/api/articles', () => {
             expect(articles.length).toBe(0);
         })
     })
-    test('GET 404: Should return an appropriate status and error message if provided an invalid query', () => {
+    test('GET 400: Should return an appropriate status and error message if provided an invalid query', () => {
         return request(app)
         .get('/api/articles?topic=food')
-        .expect(404)
+        .expect(400)
         .then(({ body: { message }}) => {
             expect(message).toBe('Invalid Query')
         })
@@ -257,18 +255,18 @@ describe('/api/articles', () => {
             })
         })
     })
-    test('GET 404: Should return an appropriate status and error message if provided an invalid sort_by', () => {
+    test('GET 400: Should return an appropriate status and error message if provided an invalid sort_by', () => {
         return request(app)
         .get('/api/articles?sort_by=invalid_sort')
-        .expect(404)
+        .expect(400)
         .then(({ body: { message }}) => {
             expect(message).toBe('Invalid Query')
         })
     })
-    test('GET 404: Should return an appropriate status and error message if provided an invalid order', () => {
+    test('GET 400: Should return an appropriate status and error message if provided an invalid order', () => {
         return request(app)
         .get('/api/articles?order=invalid_order')
-        .expect(404)
+        .expect(400)
         .then(({ body: { message }}) => {
             expect(message).toBe('Invalid Query')
         })
@@ -313,7 +311,7 @@ describe('/api/articles', () => {
             expect(message).toBe('Bad Request')
         })
     })
-    test('POST 400: Should return an appropriate status and error message if provided a bad article (extra properties)', () => {
+    test('POST 400: Should return an appropriate status and error message when provided extra unwanted properties in the new article object', () => {
         const newArticle = {
             author: 'icellusedkars',
             title: '5 things you can do with paper',
@@ -440,10 +438,25 @@ describe('/api/articles/:article_id/comments', () => {
             expect(message).toBe('Bad Request')
         })
     })
-    test('POST 404: Should return an appropriate status and error message when provided with an invalid username', () => {
+    test('POST 400: Should return an appropriate status and error message when provided with extra unwanted properties in the new comment object', () => {
         const newComment = {
             body: 'I love pugs',
-            username: 'invalid_user'
+            username: 'invalid_user',
+            maliciousProperty: "delete everything"
+            
+        }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe('Invalid Comment')
+        })
+    })
+    test('POST 404: Should return an appropriate status and error message when provided with a non-existent user', () => {
+        const newComment = {
+            body: 'I love pugs',
+            username: 'non_existent_user'
         }
         return request(app)
         .post('/api/articles/3/comments')
@@ -561,6 +574,11 @@ describe('/api/comments/:comment_id', () => {
         return request(app)
         .delete('/api/comments/1')
         .expect(204)
+        .then(() => {
+            return db.query(`SELECT * FROM comments`).then(({ rows }) => {
+                expect(rows.length).toBe(17);
+            })
+        })
     })
     test('DELETE 404: Should return an appropriate status and error message when provided a valid but non-existent comment ID', () => {
         return request(app)
@@ -671,9 +689,9 @@ describe('/api/users/:username', () => {
             expect(user.avatar_url).toBe('https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg');
         })
     })
-    test('GET 404: Should return an appropriate status and error message when provided an invalid username', () => {
+    test('GET 404: Should return an appropriate status and error message when provided a non-existent user', () => {
         return request(app)
-        .get('/api/users/invalid_username')
+        .get('/api/users/non_existent_user')
         .expect(404)
         .then(({ body: { message }}) => {
             expect(message).toBe('User Not Found')
