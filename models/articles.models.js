@@ -1,5 +1,4 @@
 const db = require('../db/connection');
-const articles = require('../db/data/test-data/articles');
 const { selectTopics } = require('./topics.models');
 
 exports.getArticleDataById = (article_id) => {
@@ -116,5 +115,24 @@ exports.insertArticle = ({ author, title, body, topic }) => {
     return db.query(queryStr, [author, title, body, topic])
     .then(({ rows }) => {
         return this.getArticleDataById(rows[0].article_id)
+    })
+}
+
+exports.removeArticleById = (article_id) => {
+    return db.query(`
+        DELETE FROM comments
+        WHERE article_id=$1;`, 
+        [article_id])
+    .then(() => {
+        return db.query(`
+            DELETE FROM articles
+            WHERE article_id=$1
+            RETURNING*;`, 
+            [article_id])
+    })
+    .then(({ rows }) => {
+        if (rows.length === 0) {
+            return Promise.reject({ status: 404, message: 'Article Does Not Exist'})
+        }
     })
 }
