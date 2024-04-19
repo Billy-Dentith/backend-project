@@ -1,4 +1,4 @@
-const { getArticleDataById, getAllArticlesData, updateArticle, insertArticle, getArticleCount } = require("../models/articles.models")
+const { getArticleDataById, getAllArticlesData, updateArticle, insertArticle, getArticleCount, removeArticleById } = require("../models/articles.models")
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
@@ -42,4 +42,11 @@ exports.postArticle = (req, res, next) => {
     } else {
         res.status(400).send({ message: 'Invalid Article' })
     }
+}
+
+exports.deleteArticleById = (req, res, next) => {
+    const { article_id } = req.params
+    removeArticleById(article_id).then((article) => {
+        res.status(204).send({ article });
+    }).catch(next)
 }
