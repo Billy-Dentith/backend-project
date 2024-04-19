@@ -12,7 +12,7 @@ exports.insertTopic = ({ slug, description }) => {
             (slug, description)
         VALUES 
             ($1, $2)
-        RETURNING*`, 
+        RETURNING*;`, 
         [slug, description])
         .then(({ rows }) => {
             return rows[0];

@@ -13,15 +13,30 @@ exports.getCommentsByArticleId = (req, res, next) => {
 }
 
 exports.postComment = (req, res, next) => {
-    const { body, username } = req.body 
+    const newComment = req.body 
     const article_id = req.params.article_id
+    const acceptedProperties = ['body', 'username'];
+    let validComment = true;
 
-    checkUserExists(username).then(() => {
-        insertComment(body, username, article_id)
-        .then((comment) => {
-            res.status(201).send({ comment })
+    Object.keys(newComment).forEach((key) => {
+        if (!acceptedProperties.includes(key)) {
+            validComment = false;
+        }
+    })
+
+    if (validComment) {
+        checkUserExists(newComment.username)
+        .then(() => {
+            insertComment(newComment, article_id)
+            .then((comment) => {
+                res.status(201).send({ comment })
+            }).catch(next)
         }).catch(next)
-    }).catch(next)
+    } else {
+        res.status(400).send({ message: 'Invalid Comment' })
+    }
+
+    
 }
 
 exports.deleteCommentById = (req, res, next) => {
