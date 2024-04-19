@@ -45,6 +45,47 @@ describe('/api/topics', () => {
             })
         })
     })
+    test('POST 201: Should return the posted topic', () => {
+        const newTopic = {
+            slug: "new topic",
+            description: "new topic description"
+        }
+        return request(app)
+        .post('/api/topics')
+        .send(newTopic)
+        .expect(201)
+        .then(({ body: { topic }}) => {
+            expect(topic.slug).toBe("new topic")
+            expect(topic.description).toBe("new topic description")
+
+        })
+    })
+    test('POST 400: Should return an appropriate status and error message when provided a bad topic (no slug/description)', () => {
+        const newTopic = {
+            description: "new topic description"
+        }
+        return request(app)
+        .post('/api/topics')
+        .send(newTopic)
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe("Bad Request")
+        })
+    })
+    test('POST 400: Should return an appropriate status and error message when provided with extra unwanted properties in the new topic', () => {
+        const newTopic = {
+            slug: "new topic",
+            description: "new topic description",
+            maliciousProperty: "delete everything"
+        }
+        return request(app)
+        .post('/api/topics')
+        .send(newTopic)
+        .expect(400)
+        .then(({ body: { message }}) => {
+            expect(message).toBe("Invalid Topic")
+        })
+    })
 })
 
 describe('/api', () => {
