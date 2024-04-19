@@ -274,7 +274,7 @@ describe('/api/articles', () => {
 })
 
 describe('/api/articles', () => {
-    test('POST 201: Should return the posted article', () => {
+    test('POST 201: Should return the posted article with a default article_img_url', () => {
         const newArticle = {
             author: 'icellusedkars',
             title: '5 things you can do with paper',
@@ -295,6 +295,32 @@ describe('/api/articles', () => {
                 created_at: expect.any(String),
                 votes: 0,
                 article_img_url: 'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700',
+                comment_count: 0
+            })
+        })
+    })
+    test('POST 201: Should return the posted article with the provided article_img_url', () => {
+        const newArticle = {
+            author: 'icellusedkars',
+            title: '5 things you can do with paper',
+            body: 'origami, paper planes, take notes, throw at someone, burn',
+            topic: 'paper',
+            article_img_url: 'article_image_url_example'
+        }
+        return request(app)
+        .post('/api/articles')
+        .send(newArticle)
+        .expect(201)
+        .then(({ body: { article }}) => {
+            expect(article).toMatchObject({
+                article_id: 14,
+                title: '5 things you can do with paper',
+                topic: 'paper',
+                author: 'icellusedkars',
+                body: 'origami, paper planes, take notes, throw at someone, burn',
+                created_at: expect.any(String),
+                votes: 0,
+                article_img_url: 'article_image_url_example',
                 comment_count: 0
             })
         })
