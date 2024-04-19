@@ -26,7 +26,7 @@ exports.patchArticleById = (req, res, next) => {
 
 exports.postArticle = (req, res, next) => {
     const newArticle = req.body;
-    const acceptedProperties = ['author', 'title', 'body', 'topic'];
+    const acceptedProperties = ['author', 'title', 'body', 'topic', 'article_img_url'];
     let validArticle = true;
 
     Object.keys(newArticle).forEach((key) => {
