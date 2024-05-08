@@ -22,7 +22,7 @@ exports.getArticleDataById = (article_id) => {
 exports.getAllArticlesData = (topic, sort_by='created_at', order='desc', limit, page) => {
     return selectTopics().then((topicsArray) => {
         const validOrders = ['asc', 'desc'];
-        const validSortBys = ['title', 'topic', 'author', 'created_at', 'votes']
+        const validSortBys = ['title', 'topic', 'author', 'created_at', 'votes', 'comment_count']
         const validTopics = topicsArray.map((topics) => {
             return topics.slug;
         })
